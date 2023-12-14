@@ -5,7 +5,7 @@
 #include "macros.h"
 #include "event_handler.h"
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 using TimerKey = uint64_t;
@@ -93,4 +93,4 @@ protected:
 };
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS

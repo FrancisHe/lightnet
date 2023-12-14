@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.14)
-project ("net" LANGUAGES C CXX)
+project ("lightnet" LANGUAGES C CXX)
 set (CMAKE_CXX_STANDARD 17)
 
 set(MY_CXX_FLAGS -Wall -fPIC -g)
@@ -11,6 +11,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # https://cmake.org/cmake/help/book/mastering-cmake/chapter/CMake%20Cache.html
 # https://cmake.org/cmake/help/latest/command/option.html
 # https://stackoverflow.com/questions/8709877/cmake-string-options
+
+# You can set the C++ namespace on your need.
+set(CPPNS "" CACHE STRING "Custom the library namespace.")
+if(CPPNS STREQUAL "")
+  set(LNETNS "${PROJECT_NAME}")
+else()
+  set(LNETNS "${CPPNS}")
+endif()
+message(STATUS "Using namepsace '${LNETNS}'")
 
 # If a variable is in the cache, it can still be overridden in a CMakeLists file using the set command without the CACHE option.
 # Command line option: cmake . -DPOLLER=epoll/poll/select
@@ -115,7 +124,7 @@ check_noexcept()
 
 # Delete any config.h left by configure
 file(REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
-configure_file(config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
+configure_file(config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h @ONLY)
 
 add_subdirectory(event)
 add_subdirectory(address)

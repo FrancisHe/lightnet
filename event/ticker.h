@@ -1,7 +1,7 @@
 #pragma once
 #include "poller.h"
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 // Periodically triggered timer.
@@ -35,4 +35,4 @@ private:
 };
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS

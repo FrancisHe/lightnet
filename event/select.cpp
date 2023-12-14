@@ -1,7 +1,7 @@
 #include "select.h"  // POSIX select() system call is in header <sys/select.h>
 #if defined POLLER_USE_SELECT
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 Select::Select() {
@@ -249,6 +249,6 @@ void Select::TriggerFdEvents(std::vector<std::pair<int, int> >& fired_fds) {
 }
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS
 
 #endif  // POLLER_USE_SELECT

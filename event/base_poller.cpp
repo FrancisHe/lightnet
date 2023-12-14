@@ -1,7 +1,7 @@
 #include "base_poller.h"
 #include <algorithm>
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 TimerKey BasePoller::AddTimer(uint32_t timeout, EventHandler* handler, int id) {
@@ -80,4 +80,4 @@ uint64_t BasePoller::GetNowMs() {
 }
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS

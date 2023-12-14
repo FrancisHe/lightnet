@@ -2,7 +2,7 @@
 #if defined POLLER_USE_POLL
 #include <algorithm>
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 const PollOption Poll::kDefaultOption;
@@ -305,6 +305,6 @@ void Poll::ShrinkPollSet() {
 }
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS
 
 #endif  // POLLER_USE_POLL

@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <new>
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 const EpollOption Epoll::kDefaultOption;
@@ -325,6 +325,6 @@ int Epoll::DoPoll() {
 }
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS
 
 #endif  // POLLER_USE_EPOLL

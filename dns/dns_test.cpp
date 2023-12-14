@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <memory>
 
-namespace net {
+namespace LNETNS {
 namespace dns {
 namespace test {
 
@@ -20,16 +20,16 @@ std::string Int2NameFamily(int family) {
   }
 }
 
-std::string StringifySockAddr(const net::address::SockAddr& addr) {
+std::string StringifySockAddr(const LNETNS::address::SockAddr& addr) {
   auto sa_family = reinterpret_cast<const sockaddr*>(&addr)->sa_family;
   if (sa_family == AF_INET6) {
     const sockaddr_in6* in6 = reinterpret_cast<const sockaddr_in6*>(&addr);
     return fmt::format("family={}, addr={}", Int2NameFamily(sa_family),
-                       net::address::ToString(in6->sin6_addr));
+                       LNETNS::address::ToString(in6->sin6_addr));
   } else {
     const sockaddr_in* in4 = reinterpret_cast<const sockaddr_in*>(&addr);
     return fmt::format("family={}, addr={}", Int2NameFamily(sa_family),
-                       net::address::ToString(in4->sin_addr));
+                       LNETNS::address::ToString(in4->sin_addr));
   }
 }
 
@@ -102,16 +102,16 @@ struct FakeProxy : public event::EventHandler {
 
 }  // namespace test
 }  // namespace dns
-}  // namespace net
+}  // namespace LNETNS
 
-#define TEST_NS net::dns::test
+#define TESTNS LNETNS::dns::test
 
 GTEST_TEST(DnsTest, CallbackLeakTest) {
-  auto poller = std::make_unique<net::event::Poller>();
+  auto poller = std::make_unique<LNETNS::event::Poller>();
 
-  net::dns::AresResolver::Options dns_opts;
+  LNETNS::dns::AresResolver::Options dns_opts;
   dns_opts.use_tcp = true;
-  auto resolver = std::make_unique<net::dns::AresResolver>(poller.get(), dns_opts);
+  auto resolver = std::make_unique<LNETNS::dns::AresResolver>(poller.get(), dns_opts);
   resolver->SetServers("8.8.8.8,8.8.4.4");
 
   std::vector<std::string> requests = {
@@ -126,7 +126,7 @@ GTEST_TEST(DnsTest, CallbackLeakTest) {
   };
 
   // Resolution cannot be done in 50ms.
-  auto proxy = std::make_unique<TEST_NS::FakeProxy>(poller.get(), resolver.get(),
+  auto proxy = std::make_unique<TESTNS::FakeProxy>(poller.get(), resolver.get(),
                                                     std::move(requests), 50);
   proxy->StartParallelResolve();
   do {
@@ -146,11 +146,11 @@ GTEST_TEST(DnsTest, CallbackLeakTest) {
 }
 
 GTEST_TEST(DnsTest, ParallelResolveTest) {
-  auto poller = std::make_unique<net::event::Poller>();
+  auto poller = std::make_unique<LNETNS::event::Poller>();
 
-  net::dns::AresResolver::Options dns_opts;
+  LNETNS::dns::AresResolver::Options dns_opts;
   dns_opts.use_tcp = true;
-  auto resolver = std::make_unique<net::dns::AresResolver>(poller.get(), dns_opts);
+  auto resolver = std::make_unique<LNETNS::dns::AresResolver>(poller.get(), dns_opts);
 
   std::vector<std::string> requests = {
     "www.qq.com",
@@ -164,7 +164,7 @@ GTEST_TEST(DnsTest, ParallelResolveTest) {
   };
   auto requests_num = requests.size();
 
-  auto proxy = std::make_unique<TEST_NS::FakeProxy>(poller.get(), resolver.get(), std::move(requests));
+  auto proxy = std::make_unique<TESTNS::FakeProxy>(poller.get(), resolver.get(), std::move(requests));
   proxy->StartParallelResolve();
   do {
     poller->DoPoll();
@@ -180,4 +180,4 @@ GTEST_TEST(DnsTest, ParallelResolveTest) {
   poller.reset();  // release
 }
 
-#undef TEST_NS
+#undef TESTNS

@@ -4,7 +4,7 @@
 #include <cstring>
 #include <memory>
 
-namespace net {
+namespace LNETNS {
 namespace address {
 
 namespace {
@@ -221,4 +221,4 @@ std::string ToString(const SockAddr& sa, bool iponly) {
 }
 
 }  // namespace address
-}  // namespace net
+}  // namespace LNETNS

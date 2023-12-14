@@ -8,7 +8,7 @@
 #include "address/sockaddr.h"
 #include "ares.h"
 
-namespace net {
+namespace LNETNS {
 namespace dns {
 
 enum class AddrFamily {
@@ -116,4 +116,4 @@ inline const std::string& AresResolver::GetLastError() const {
 }
 
 }  // namespace dns
-}  // namespace net
+}  // namespace LNETNS

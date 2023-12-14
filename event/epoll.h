@@ -7,7 +7,7 @@
 #include <memory>
 #include "base_poller.h"
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 struct EpollOption {
@@ -55,6 +55,6 @@ private:
 using Poller = Epoll;
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS
 
 #endif  // POLLER_USE_EPOLL

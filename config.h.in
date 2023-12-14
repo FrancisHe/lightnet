@@ -1,6 +1,8 @@
 // From "libzmq/builds/cmake/platform.hpp.in"
 #pragma once
 
+#cmakedefine LNETNS @LNETNS@
+
 #cmakedefine DEBUG_BUILD
 
 #cmakedefine POLLER_USE_EPOLL

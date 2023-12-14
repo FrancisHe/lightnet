@@ -8,7 +8,7 @@
 #include <vector>
 #include "base_poller.h"
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 // Implements socket polling mechanism using POSIX.1-2001 select() function.
@@ -59,6 +59,6 @@ private:
 using Poller = Select;
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS
 
 #endif  // POLLER_USE_SELECT

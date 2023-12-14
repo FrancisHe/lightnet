@@ -1,11 +1,13 @@
 #pragma once
+#include "config.h"
+
 #include <arpa/inet.h>
 #include <sys/un.h>  // sockaddr_un
 
 #include <string>
 #include <memory>
 
-namespace net {
+namespace LNETNS {
 namespace address {
 
 // see "socket/socket-api.md"
@@ -42,4 +44,4 @@ std::string ToString(const in6_addr& sa);
 std::string ToString(const SockAddr& sa, bool iponly = false);
 
 }  // namespace address
-}  // namespace net
+}  // namespace LNETNS

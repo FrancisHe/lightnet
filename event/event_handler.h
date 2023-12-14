@@ -1,6 +1,7 @@
 #pragma once
+#include "config.h"
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 enum EventType {
@@ -31,4 +32,4 @@ protected:
 };
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS

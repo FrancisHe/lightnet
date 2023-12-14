@@ -15,40 +15,40 @@ static const char* kModeSync = "SYNC";
 static const char* kModeAsync = "ASYNC";
 
 struct ResolverDemo {
-  void OnComplete(net::dns::ResolveStatus status, net::dns::AddrList&& addrs);
+  void OnComplete(LNETNS::dns::ResolveStatus status, LNETNS::dns::AddrList&& addrs);
 
   bool completed{false};
-  net::dns::ResolveStatus status{net::dns::kResolveFailure};
-  net::dns::AddrList addrs;
+  LNETNS::dns::ResolveStatus status{LNETNS::dns::kResolveFailure};
+  LNETNS::dns::AddrList addrs;
 };
 
-void ResolverDemo::OnComplete(net::dns::ResolveStatus status, net::dns::AddrList&& addrs) {
+void ResolverDemo::OnComplete(LNETNS::dns::ResolveStatus status, LNETNS::dns::AddrList&& addrs) {
   this->status = status;
   this->addrs = std::move(addrs);
   completed = true;
 }
 
-net::dns::ResolveCb MakeResolverDemoCallback(ResolverDemo& demo) {
+LNETNS::dns::ResolveCb MakeResolverDemoCallback(ResolverDemo& demo) {
   using std::placeholders::_1;
   using std::placeholders::_2;
   return std::bind(&ResolverDemo::OnComplete, demo, _1, _2);
 }
 
-net::dns::ResolveCb MakeResolverDemoCallback(ResolverDemo* demo) {
+LNETNS::dns::ResolveCb MakeResolverDemoCallback(ResolverDemo* demo) {
   using std::placeholders::_1;
   using std::placeholders::_2;
   // std::bind accept both a reference and a pointer.
   return std::bind(&ResolverDemo::OnComplete, demo, _1, _2);
 }
 
-net::dns::ResolveCb MakeResolverDemoCallbackLambda(ResolverDemo& demo) {
-  return [&demo](net::dns::ResolveStatus status, net::dns::AddrList&& addrs) {
+LNETNS::dns::ResolveCb MakeResolverDemoCallbackLambda(ResolverDemo& demo) {
+  return [&demo](LNETNS::dns::ResolveStatus status, LNETNS::dns::AddrList&& addrs) {
     demo.OnComplete(status, std::move(addrs));
   };
 }
 
-net::dns::ResolveCb MakeResolverDemoCallbackLambda(ResolverDemo* demo) {
-  return [&demo](net::dns::ResolveStatus status, net::dns::AddrList&& addrs) {
+LNETNS::dns::ResolveCb MakeResolverDemoCallbackLambda(ResolverDemo* demo) {
+  return [&demo](LNETNS::dns::ResolveStatus status, LNETNS::dns::AddrList&& addrs) {
     demo->OnComplete(status, std::move(addrs));
   };
 }
@@ -64,16 +64,16 @@ std::string Int2NameFamily(int family) {
   }
 }
 
-std::string StringifySockAddr(const net::address::SockAddr& addr) {
+std::string StringifySockAddr(const LNETNS::address::SockAddr& addr) {
   auto sa_family = reinterpret_cast<const sockaddr*>(&addr)->sa_family;
   if (sa_family == AF_INET6) {
     const sockaddr_in6* in6 = reinterpret_cast<const sockaddr_in6*>(&addr);
     return fmt::format("family={}, addr={}", Int2NameFamily(sa_family),
-                       net::address::ToString(in6->sin6_addr));
+                       LNETNS::address::ToString(in6->sin6_addr));
   } else {
     const sockaddr_in* in4 = reinterpret_cast<const sockaddr_in*>(&addr);
     return fmt::format("family={}, addr={}", Int2NameFamily(sa_family),
-                       net::address::ToString(in4->sin_addr));
+                       LNETNS::address::ToString(in4->sin_addr));
   }
 }
 
@@ -82,22 +82,22 @@ int main(int argc, char* argv[]) {
   gflags::SetUsageMessage(usage);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  net::event::Poller dispatcher;
+  LNETNS::event::Poller dispatcher;
   if (!dispatcher) {
     fmt::println(stderr, "Create dispatcher failed: {}",
                  strerror(dispatcher.GetLastErrno()));
     return 1;
   }
 
-  net::dns::AresResolver::Options dns_opts;
+  LNETNS::dns::AresResolver::Options dns_opts;
   dns_opts.use_tcp = FLAGS_use_tcp;
   dns_opts.timeout = FLAGS_timeout;
-  net::dns::AresResolver resolver(&dispatcher, dns_opts);
+  LNETNS::dns::AresResolver resolver(&dispatcher, dns_opts);
   resolver.SetServers(FLAGS_servers);
 
   ResolverDemo demo;
   const char* mode = kModeAsync;
-  auto dns_query = resolver.Resolve(FLAGS_host, net::dns::AddrFamily::kUnSpec,
+  auto dns_query = resolver.Resolve(FLAGS_host, LNETNS::dns::AddrFamily::kUnSpec,
                                     MakeResolverDemoCallback(&demo));
   if (!dns_query) {
     if (!demo.completed) {
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
                  dispatcher.FdCount(), dispatcher.TimerCount());
   }
 
-  if (demo.status == net::dns::kResolveFailure) {
+  if (demo.status == LNETNS::dns::kResolveFailure) {
     fmt::println(stderr, "Resolve failed");
     return 3;
   }

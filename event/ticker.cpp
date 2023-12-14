@@ -1,7 +1,7 @@
 #include "ticker.h"
 #include <cassert>
 
-namespace net {
+namespace LNETNS {
 namespace event {
 
 Ticker::Ticker(Poller* poller, uint32_t interval)
@@ -43,4 +43,4 @@ void Ticker::OnTimeout(int id) {
 }
 
 }  // namespace event
-}  // namespace net
+}  // namespace LNETNS

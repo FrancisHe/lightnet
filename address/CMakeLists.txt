@@ -1,8 +1,9 @@
 add_library(address
   "sockaddr.cpp"
+  "${PROJECT_SOURCE_DIR}/config.h"
 )
 target_compile_options(address PRIVATE ${MY_CXX_FLAGS})
-target_include_directories(address PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(address PUBLIC ${PROJECT_SOURCE_DIR})
 target_link_libraries(address)
 
 add_executable(sockaddr_test

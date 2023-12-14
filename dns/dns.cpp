@@ -3,7 +3,7 @@
 #include <string>
 #include "debug.h"
 
-namespace net {
+namespace LNETNS {
 namespace dns {
 
 const AresResolver::Options AresResolver::kDefaultOptions;
@@ -84,10 +84,10 @@ DnsQuery* AresResolver::Resolve(const std::string& name, AddrFamily af, ResolveC
 
   ares_addrinfo_hints hints = {};
   switch (af) {
-  case net::dns::AddrFamily::kInet4:
+  case LNETNS::dns::AddrFamily::kInet4:
     hints.ai_family = AF_INET;
     break;
-  case net::dns::AddrFamily::kInet6:
+  case LNETNS::dns::AddrFamily::kInet6:
     hints.ai_family = AF_INET6;
     break;
   default:
@@ -293,5 +293,5 @@ void AresResolver::Query::OnGetAddrInfoCallback(int status, int timeouts, ares_a
 }
 
 }  // namespace dns
-}  // namespace net
+}  // namespace LNETNS
 
