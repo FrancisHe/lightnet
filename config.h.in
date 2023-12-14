@@ -1,0 +1,28 @@
+// From "libzmq/builds/cmake/platform.hpp.in"
+#pragma once
+
+#cmakedefine DEBUG_BUILD
+
+#cmakedefine POLLER_USE_EPOLL
+#cmakedefine POLLER_USE_EPOLL_CLOEXEC
+#cmakedefine POLLER_USE_POLL
+#cmakedefine POLLER_USE_SELECT
+#cmakedefine HAVE_ACCEPT4
+
+#cmakedefine HAVE_SOCK_CLOEXEC
+#cmakedefine HAVE_O_CLOEXEC
+#cmakedefine HAVE_SO_KEEPALIVE
+#cmakedefine HAVE_TCP_KEEPCNT
+#cmakedefine HAVE_TCP_KEEPIDLE
+#cmakedefine HAVE_TCP_KEEPINTVL
+#cmakedefine HAVE_TCP_KEEPALIVE
+
+#cmakedefine HAVE_SO_PRIORITY
+
+#cmakedefine HAVE_PTHREAD_SETNAME_1
+#cmakedefine HAVE_PTHREAD_SETNAME_2
+#cmakedefine HAVE_PTHREAD_SETNAME_3
+#cmakedefine HAVE_PTHREAD_SET_NAME
+#cmakedefine HAVE_PTHREAD_SET_AFFINITY
+
+#cmakedefine HAVE_NOEXCEPT
