@@ -1,7 +1,7 @@
 #! /bin/sh
 
-LONG_OPTIONS=poller:,debug,job:,verbose
-OPTIONS=p:dj:v
+LONG_OPTIONS=poller:,ns:,debug,job:,verbose
+OPTIONS=p:n:dj:v
 DEBUG=0
 JOB=8
 VERBOSE=0
@@ -11,6 +11,7 @@ eval set -- "$ARGS"
 while true; do
     case "$1" in
         -p | --poller) POLLER=$2; shift 2;;
+        -n | --ns) CPPNS=$2; shift 2;;
         -d | --debug) ((DEBUG++)); shift;;
         -j | --job) JOB=$2; shift 2;;
         -v | --verbose) ((VERBOSE++)); shift;;
@@ -22,6 +23,9 @@ done
 CMAKE_OPT=
 if [ ! -z "$POLLER" ]; then
     CMAKE_OPT="$CMAKE_OPT -DPOLLER=$POLLER"
+fi
+if [ ! -z "$CPPNS" ]; then
+    CMAKE_OPT="$CMAKE_OPT -DCPPNS=$CPPNS"
 fi
 if [ $DEBUG -ne 0 ]; then
     CMAKE_OPT="$CMAKE_OPT -DENABLE_DEBUG=ON"
