@@ -3,7 +3,7 @@
 
 #cmakedefine LNETNS @LNETNS@
 
-#cmakedefine DEBUG_BUILD
+#cmakedefine LNET_DEBUG
 
 #cmakedefine POLLER_USE_EPOLL
 #cmakedefine POLLER_USE_EPOLL_CLOEXEC

@@ -6,7 +6,6 @@
       "configurationType": "Debug",
       "cmakeExecutable": "cmake",
       "remoteCopySourcesExclusionList": [ ".vs", ".git", "out", "config.h" ],
-      "cmakeCommandArgs": "-DENABLE_DEBUG=ON",
       "buildCommandArgs": "-j8",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
@@ -17,7 +16,19 @@
       "remoteCopySources": true,
       "rsyncCommandArgs": "-t --delete",
       "remoteCopyBuildOutput": false,
-      "remoteCopySourcesMethod": "rsync"
+      "remoteCopySourcesMethod": "rsync",
+      "variables": [
+        {
+          "name": "LNET_DEBUG",
+          "value": "true",
+          "type": "BOOL"
+        },
+        {
+          "name": "LNET_BUILD_TESTS",
+          "value": "true",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "Linux-GCC-Release",

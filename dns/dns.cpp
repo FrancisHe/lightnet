@@ -181,12 +181,12 @@ void AresResolver::UpdateTimer() {
     LOG_DEBUG("Set timeout value to {}", ms);
     timer_key_ = poller_->AddTimer(ms, this);
   }
-#ifdef DEBUG_BUILD
+#ifdef LNET_DEBUG
   else {
     LOG_DEBUG("No pending query.");
     // Cancel timer (already done above).
   }
-#endif  // DEBUG_BUILD
+#endif  // LNET_DEBUG
 }
 
 void AresResolver::OnAresSocketStateChange(int fd, int read, int write) {
@@ -230,12 +230,12 @@ void AresResolver::OnTimeout(int id) {
 
 void AresResolver::Query::OnGetAddrInfoCallback(int status, int timeouts, ares_addrinfo* addrinfo) {
   completed_ = true;
-#ifdef DEBUG_BUILD
+#ifdef LNET_DEBUG
   // host_query.timeouts: number of timeouts we saw for this request
   if (timeouts > 0) {
     LOG_DEBUG("Query timed out {} times.", timeouts);
   }
-#endif  // DEBUG_BUILD
+#endif  // LNET_DEBUG
 
   std::list<address::SockAddr> addrs;
   ResolveStatus resolve_status;

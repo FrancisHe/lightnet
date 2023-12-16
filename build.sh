@@ -1,8 +1,9 @@
 #! /bin/sh
 
-LONG_OPTIONS=poller:,ns:,debug,job:,verbose
-OPTIONS=p:n:dj:v
-DEBUG=0
+LONG_OPTIONS=poller:,ns:,with_debug,with_test,job:,verbose
+OPTIONS=p:n:dtj:v
+WITH_DEBUG=0
+WITH_TEST=0
 JOB=8
 VERBOSE=0
 
@@ -12,7 +13,8 @@ while true; do
     case "$1" in
         -p | --poller) POLLER=$2; shift 2;;
         -n | --ns) CPPNS=$2; shift 2;;
-        -d | --debug) ((DEBUG++)); shift;;
+        -d | --with_debug) ((WITH_DEBUG++)); shift;;
+        -t | --with_test) ((WITH_TEST++)); shift;;
         -j | --job) JOB=$2; shift 2;;
         -v | --verbose) ((VERBOSE++)); shift;;
         --) shift; break;;
@@ -22,13 +24,16 @@ done
 
 CMAKE_OPT=
 if [ ! -z "$POLLER" ]; then
-    CMAKE_OPT="$CMAKE_OPT -DPOLLER=$POLLER"
+    CMAKE_OPT="$CMAKE_OPT -DLNET_POLLER=$POLLER"
 fi
 if [ ! -z "$CPPNS" ]; then
     CMAKE_OPT="$CMAKE_OPT -DCPPNS=$CPPNS"
 fi
-if [ $DEBUG -ne 0 ]; then
-    CMAKE_OPT="$CMAKE_OPT -DENABLE_DEBUG=ON"
+if [ $WITH_DEBUG -ne 0 ]; then
+    CMAKE_OPT="$CMAKE_OPT -DLNET_DEBUG=ON"
+fi
+if [ $WITH_TEST -ne 0 ]; then
+    CMAKE_OPT="$CMAKE_OPT -DLNET_BUILD_TESTS=ON"
 fi
 
 if [ ! -e cmake-build ]; then

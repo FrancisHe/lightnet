@@ -1,5 +1,5 @@
 #pragma once
-#ifdef DEBUG_BUILD
+#ifdef LNET_DEBUG
 #include "fmt/format.h"
 
 #define LOG_ERROR(format, args...) fmt::println(stderr, __FILE__":{}:ERROR: " format, __LINE__, ##args)
@@ -17,4 +17,4 @@
 #define LOG_INFO(format, args...) do {} while(0)
 #define LOG_DEBUG(format, args...) do {} while(0)
 
-#endif  // DEBUG_BUILD
+#endif  // LNET_DEBUG
