@@ -16,11 +16,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # CMake Option:
 # https://cmake.org/cmake/help/book/mastering-cmake/chapter/CMake%20Cache.html
-# https://cmake.org/cmake/help/latest/command/option.html
 # https://stackoverflow.com/questions/8709877/cmake-string-options
 
-# You can set the C++ namespace on your need.
+# Command line options: -DLNET_CPPNS=lightnet -DLNET_POLLER=epoll/poll/select -DLNET_DEBUG=ON
+# You can set the C++ namespace as your need.
 set(LNET_CPPNS "" CACHE STRING "Custom the library namespace.")
+set(LNET_POLLER "" CACHE STRING "Choose polling system, valid values are epoll, poll or select [default=autodetect]")
+option(LNET_BUILD_DNS "Build dns sub-module" ON)
+option(LNET_DEBUG "Print debug message to stdout/stderr" OFF)
+option(LNET_BUILD_TESTS "Build tests and demos" OFF)
+
+# This is a cmake global variable.
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
 if(LNET_CPPNS STREQUAL "")
   set(LNETNS "${PROJECT_NAME}")
 else()
@@ -28,52 +36,105 @@ else()
 endif()
 message(STATUS "Using namepsace '${LNETNS}'")
 
-# If a variable is in the cache, it can still be overridden in a CMakeLists file using the set command without the CACHE option.
-# Command line option: cmake . -DLNET_POLLER=epoll/poll/select
-set(LNET_POLLER "" CACHE STRING "Choose polling system, valid values are epoll, poll or select [default=autodetect]")
-
-# Command line option: cmake . -DSTATIC_CARES_LIB=ON
-option(STATIC_CARES_LIB "Build c-ares as a static library" ON)
-option(LNET_DEBUG "Print debug message to stdout/stderr" OFF)
-option(LNET_BUILD_TESTS "Build tests and demos" OFF)
-
 include(FetchContent) # New in version 3.11.
 
-# https://discourse.cmake.org/t/what-is-the-correct-way-to-set-options-of-a-project-before-fetch-content/268
-if(STATIC_CARES_LIB)
-  message(STATUS "Build c-ares as a static library")
-  set(CARES_STATIC ON CACHE BOOL "Build c-ares as a static library")
-  set(CARES_SHARED OFF CACHE BOOL "Build c-ares as a shared library")
-endif()
+if(LNET_BUILD_DNS)
+  set(LIB_ARES cares)
 
-FetchContent_Declare(cares
-  GIT_REPOSITORY  https://github.com/c-ares/c-ares.git
-  GIT_TAG         cares-1_23_0
-)
-set(THIRD_PARTIES cares)
+  FetchContent_Declare(${LIB_ARES}
+    GIT_REPOSITORY  https://github.com/c-ares/c-ares.git
+    GIT_TAG         cares-1_23_0
+  )
+
+  if(NOT ${LIB_ARES}_POPULATED)
+    FetchContent_Populate(${LIB_ARES})
+
+    # Override build options of c-ares.
+
+    # Store the old value
+    set(CARES_BUILD_TESTS_OLD ${CARES_BUILD_TESTS})
+    set(CARES_BUILD_CONTAINER_TESTS_OLD ${CARES_BUILD_CONTAINER_TESTS})
+    set(CARES_BUILD_TOOLS_OLD ${CARES_BUILD_TOOLS})
+
+    # Set new value
+    set(CARES_BUILD_TESTS OFF CACHE INTERNAL "Override option CARES_BUILD_TESTS")
+    set(CARES_BUILD_CONTAINER_TESTS OFF CACHE INTERNAL "Override option CARES_BUILD_CONTAINER_TESTS")
+    set(CARES_BUILD_TOOLS OFF CACHE INTERNAL "Override option CARES_BUILD_TOOLS")
+    if(BUILD_SHARED_LIBS)
+      set(CARES_STATIC OFF CACHE INTERNAL "Override option CARES_STATIC")
+      set(CARES_SHARED ON CACHE INTERNAL "Override option CARES_SHARED")
+    else()
+      set(CARES_STATIC ON CACHE INTERNAL "Override option CARES_STATIC")
+      set(CARES_SHARED OFF CACHE INTERNAL "Override option CARES_SHARED")
+    endif()
+
+    add_subdirectory(${${LIB_ARES}_SOURCE_DIR} ${${LIB_ARES}_BINARY_DIR})
+
+    # Restore the old value
+    set(CARES_BUILD_TESTS ${CARES_BUILD_TESTS_OLD} CACHE BOOL "Restore CARES_BUILD_TESTS" FORCE)
+    set(CARES_BUILD_CONTAINER_TESTS ${CARES_BUILD_CONTAINER_TESTS_OLD} CACHE BOOL "Restore CARES_BUILD_CONTAINER_TESTS" FORCE)
+    set(CARES_BUILD_TOOLS ${CARES_BUILD_TOOLS_OLD} CACHE BOOL "Restore CARES_BUILD_TOOLS" FORCE)
+  endif()
+endif()
 
 if(LNET_BUILD_TESTS)
   message(STATUS "Build tests and demos")
-  FetchContent_Declare(googletest
+
+  set(GTEST googletest)
+  set(GFLAGS gflags)
+  FetchContent_Declare(${GTEST}
     GIT_REPOSITORY    https://github.com/google/googletest
     GIT_TAG           v1.12.0
   )
-  FetchContent_Declare(gflags
+  FetchContent_Declare(${GFLAGS}
     GIT_REPOSITORY  https://github.com/gflags/gflags.git
     GIT_TAG         v2.2.2
   )
-  list(APPEND THIRD_PARTIES googletest gflags)
+
+  if(NOT ${GTEST}_POPULATED)
+    FetchContent_Populate(${GTEST})
+
+    # Store the old value
+    set(BUILD_GMOCK_OLD ${BUILD_GMOCK})
+    set(INSTALL_GTEST_OLD ${INSTALL_GTEST})
+
+    # Set new value
+    set(BUILD_GMOCK OFF CACHE INTERNAL "Override option BUILD_GMOCK")
+    set(INSTALL_GTEST OFF CACHE INTERNAL "Override option INSTALL_GTEST")
+
+    add_subdirectory(${${GTEST}_SOURCE_DIR} ${${GTEST}_BINARY_DIR})
+
+    # Restore the old value
+    set(BUILD_GMOCK ${BUILD_GMOCK_OLD} CACHE BOOL "Restore BUILD_GMOCK" FORCE)
+    set(INSTALL_GTEST ${INSTALL_GTEST_OLD} CACHE BOOL "Restore INSTALL_GTEST" FORCE)
+  endif()
+
+  if(NOT ${GFLAGS}_POPULATED)
+    FetchContent_Populate(${GFLAGS})
+
+    if(BUILD_SHARED_LIBS)
+      set(GFLAGS_BUILD_STATIC_LIBS OFF CACHE INTERNAL "Override option GFLAGS_BUILD_STATIC_LIBS")
+      set(GFLAGS_BUILD_SHARED_LIBS ON CACHE INTERNAL "Override option GFLAGS_BUILD_SHARED_LIBS")
+    else()
+      set(GFLAGS_BUILD_STATIC_LIBS ON CACHE INTERNAL "Override option GFLAGS_BUILD_STATIC_LIBS")
+      set(GFLAGS_BUILD_SHARED_LIBS OFF CACHE INTERNAL "Override option GFLAGS_BUILD_SHARED_LIBS")
+    endif()
+
+    add_subdirectory(${${GFLAGS}_SOURCE_DIR} ${${GFLAGS}_BINARY_DIR})
+  endif()
 endif()
 
 if(LNET_BUILD_TESTS OR LNET_DEBUG)
-  FetchContent_Declare(fmt
+  set(LIB_FMT fmt)
+  FetchContent_Declare(${LIB_FMT}
     GIT_REPOSITORY  https://github.com/fmtlib/fmt.git
     GIT_TAG         10.1.1
   )
-  list(APPEND THIRD_PARTIES fmt)
+  if(NOT ${LIB_FMT}_POPULATED)
+    FetchContent_Populate(${LIB_FMT})
+    add_subdirectory(${${LIB_FMT}_SOURCE_DIR} ${${LIB_FMT}_BINARY_DIR})
+  endif()
 endif()
-
-FetchContent_MakeAvailable(${THIRD_PARTIES})
 
 # Refer to https://github.com/zeromq/libzmq/blob/master/CMakeLists.txt
 include(CheckCSourceRuns) # check_c_source_runs
@@ -144,4 +205,6 @@ configure_file(config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h @ONLY)
 
 add_subdirectory(event)
 add_subdirectory(address)
-add_subdirectory(dns)
+if(LNET_BUILD_DNS)
+  add_subdirectory(dns)
+endif()
